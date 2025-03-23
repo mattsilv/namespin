@@ -282,8 +282,8 @@ export default function PrizeWheel() {
     const p1 = accelerationPhase / duration;
     const p2 = (accelerationPhase + constantSpeedPhase) / duration;
     
-    // Create a custom ease function with three phases
-    const multiPhaseEase = gsap.utils.wrap(0, 1, (progress: number) => {
+    // Create a custom ease function with three phases - use a regular function, not gsap.utils.wrap
+    const multiPhaseEase = function(progress: number) {
       if (progress < p1) {
         // Acceleration phase - easeInQuad
         return (progress / p1) * (progress / p1) * 0.15; // Scale to 15% of total rotation
@@ -297,7 +297,7 @@ export default function PrizeWheel() {
         const easeValue = 1 - Math.pow(1 - phaseProgress, 3);
         return 0.7 + easeValue * 0.3; // Scale from 70% to 100% of total rotation
       }
-    });
+    };
     
     animationRef.current = gsap.to(
       {},
