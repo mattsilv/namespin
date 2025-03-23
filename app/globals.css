@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 255, 255, 255;
+
+  /* WHEEL DIMENSIONS - These should match config.ts values */
+  --wheel-diameter: 400px; /* Should match config.ts dimensions.diameter */
+  --wheel-max-diameter: 800px; /* Should match config.ts dimensions.maxDiameter */
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/**
+ * WHEEL CONTAINER STYLING
+ * 
+ * This class establishes the dimensions and positioning for the wheel container.
+ * 
+ * IMPORTANT: For size changes, update the wheel dimensions in config.ts first,
+ * then update the corresponding CSS variables at the top of this file.
+ * 
+ * CRITICAL PROPERTIES:
+ * - width/height: These determine the square dimensions of the container
+ * - max-width: Limits the overall size on larger screens
+ * - position: relative - allows positioning of child elements
+ * - overflow: visible - allows the pointer to extend beyond the container
+ */
+.wheel-container {
+  position: relative;
+  width: var(--wheel-diameter);
+  height: var(--wheel-diameter); /* Creates a perfect square */
+  max-width: var(--wheel-max-diameter);
+  max-height: var(--wheel-max-diameter);
+  margin: 0 auto;
+  overflow: visible; /* Allows pointer to extend beyond container */
+  touch-action: manipulation; /* Prevents unwanted touch behaviors */
+}
+
+/**
+ * WHEEL CANVAS STYLING
+ * 
+ * This class styles the canvas element where the wheel is drawn.
+ * 
+ * CRITICAL PROPERTIES:
+ * - display: block - prevents inline spacing issues with canvas
+ * - width/height: 100% - ensures canvas fills its container
+ * 
+ * Note: The actual canvas dimensions are set in JavaScript via:
+ * canvas.width/height (internal resolution) 
+ * canvas.style.width/height (visual size)
+ */
+.wheel-canvas {
+  display: block; /* Critical: removes inline element spacing */
+  width: 100%;
+  height: 100%;
+}
+
+/* For smaller screens, scale the wheel down */
+@media (max-width: 640px) {
+  .wheel-container {
+    width: calc(
+      var(--wheel-diameter) * 0.8
+    ); /* Apply mobile scaling from config */
+    height: calc(
+      var(--wheel-diameter) * 0.8
+    ); /* Apply mobile scaling from config */
+  }
+}
+
+/**
+ * SPIN BUTTON STYLING
+ */
+.spin-button {
+  padding: 12px 24px;
+  font-size: 1.25rem;
+  font-weight: bold;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 30px;
+}
+
+.spin-button:hover {
+  background-color: #2563eb;
+}
+
+.spin-button:disabled {
+  background-color: #93c5fd;
+  cursor: not-allowed;
+}
