@@ -112,7 +112,7 @@ function drawWheelSegments(
 
     // Show message to add names
     ctx.fillStyle = "#000000";
-    ctx.font = "16px Arial";
+    ctx.font = "16px var(--font-montagu-slab), serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("Add names to spin", centerX, centerY);

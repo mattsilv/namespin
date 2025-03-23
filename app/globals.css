@@ -76,6 +76,11 @@ body {
   /* The DimensionProvider now handles mobile scaling */
 }
 
+/* Ensure font variables are available for all contexts */
+:root {
+  font-synthesis: none;
+}
+
 /**
  * SPIN BUTTON STYLING
  */

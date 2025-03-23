@@ -119,7 +119,7 @@ export const defaultConfig: WheelConfig = {
     // Text styling
     textConfig: {
       fontSize: 16, // Text size in pixels
-      fontFamily: "Arial, sans-serif",
+      fontFamily: "var(--font-montagu-slab), serif",
       color: "#FFFFFF", // Text color
     },
 
