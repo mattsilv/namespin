@@ -6,9 +6,13 @@
   --foreground-rgb: 0, 0, 0;
   --background-rgb: 255, 255, 255;
 
-  /* WHEEL DIMENSIONS - These should match config.ts values */
-  --wheel-diameter: 400px; /* Should match config.ts dimensions.diameter */
-  --wheel-max-diameter: 800px; /* Should match config.ts dimensions.maxDiameter */
+  /* WHEEL DIMENSIONS - Dynamically set by dimensions.ts */
+  --wheel-container-width: 400px;
+  --wheel-container-height: 400px;
+  --wheel-radius: 180px;
+  --wheel-border-width: 2px;
+  --wheel-font-size: 16px;
+  --wheel-pointer-size: 20px;
 }
 
 body {
@@ -24,24 +28,28 @@ body {
  * 
  * This class establishes the dimensions and positioning for the wheel container.
  * 
- * IMPORTANT: For size changes, update the wheel dimensions in config.ts first,
- * then update the corresponding CSS variables at the top of this file.
+ * IMPORTANT: The dimensions are now controlled by the dimension provider.
+ * Do NOT hardcode dimensions here.
  * 
  * CRITICAL PROPERTIES:
- * - width/height: These determine the square dimensions of the container
- * - max-width: Limits the overall size on larger screens
  * - position: relative - allows positioning of child elements
  * - overflow: visible - allows the pointer to extend beyond the container
  */
 .wheel-container {
   position: relative;
-  width: var(--wheel-diameter);
-  height: var(--wheel-diameter); /* Creates a perfect square */
-  max-width: var(--wheel-max-diameter);
-  max-height: var(--wheel-max-diameter);
+  /* Dimensions are now set via CSS variables from the dimension provider */
+  width: var(--wheel-container-width);
+  height: var(--wheel-container-height);
   margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   overflow: visible; /* Allows pointer to extend beyond container */
   touch-action: manipulation; /* Prevents unwanted touch behaviors */
+  aspect-ratio: 1 / 1; /* Ensure it stays square */
+  box-sizing: border-box;
+  /* Add a subtle debug border to see container bounds */
+  border: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 /**
@@ -53,7 +61,7 @@ body {
  * - display: block - prevents inline spacing issues with canvas
  * - width/height: 100% - ensures canvas fills its container
  * 
- * Note: The actual canvas dimensions are set in JavaScript via:
+ * Note: The actual canvas dimensions are set by the dimension provider via:
  * canvas.width/height (internal resolution) 
  * canvas.style.width/height (visual size)
  */
@@ -63,16 +71,9 @@ body {
   height: 100%;
 }
 
-/* For smaller screens, scale the wheel down */
+/* For smaller screens, let the dimension provider handle scaling */
 @media (max-width: 640px) {
-  .wheel-container {
-    width: calc(
-      var(--wheel-diameter) * 0.8
-    ); /* Apply mobile scaling from config */
-    height: calc(
-      var(--wheel-diameter) * 0.8
-    ); /* Apply mobile scaling from config */
-  }
+  /* The DimensionProvider now handles mobile scaling */
 }
 
 /**

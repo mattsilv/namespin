@@ -39,12 +39,14 @@ import { normalizeAngle } from "./physics";
  * @param participants List of participant names to display on segments
  * @param angle Current rotation angle of the wheel in radians
  * @param config Wheel configuration object from config.ts
+ * @param dimensions Wheel dimensions from the dimension provider
  */
 export function drawWheel(
   ctx: CanvasRenderingContext2D,
   participants: string[],
   angle: number,
-  config: WheelConfig
+  config: WheelConfig,
+  dimensions?: { radius: number } // Optional dimension override
 ): void {
   // Get canvas dimensions
   const { width, height } = ctx.canvas;
@@ -61,8 +63,8 @@ export function drawWheel(
   const centerY = Math.floor(height / 2);
 
   // Calculate wheel radius based on available space
-  // Uses 85% of the available space to leave room for the pointer
-  const radius = Math.min(centerX, centerY) * 0.85;
+  // If dimensions are provided, use that radius, otherwise calculate based on canvas size
+  const radius = dimensions?.radius || Math.min(centerX, centerY) * 0.9;
 
   // Draw the wheel segments
   drawWheelSegments(ctx, centerX, centerY, radius, participants, angle, config);
@@ -333,31 +335,59 @@ function drawPointer(
  *
  * CRITICAL: This function establishes the connection between
  * the DOM element dimensions and the canvas rendering dimensions.
+ * 
+ * @param canvas The canvas element to resize
+ * @param container The container element that holds the canvas
+ * @param dimensions Optional dimensions from the dimension provider
  */
 export function resizeCanvas(
   canvas: HTMLCanvasElement,
-  container: HTMLElement
+  container: HTMLElement,
+  dimensions?: {
+    containerWidth: number;
+    containerHeight: number;
+    canvasWidth: number;
+    canvasHeight: number;
+    pixelRatio: number;
+  }
 ): void {
-  // Get container dimensions
-  const rect = container.getBoundingClientRect();
+  if (dimensions) {
+    // If dimensions are provided, use them directly
+    canvas.style.width = `${dimensions.containerWidth}px`;
+    canvas.style.height = `${dimensions.containerHeight}px`;
+    canvas.width = Math.floor(dimensions.canvasWidth);
+    canvas.height = Math.floor(dimensions.canvasHeight);
 
-  // Adjust for device pixel ratio for crisp rendering
-  const pixelRatio = window.devicePixelRatio || 1;
-  const containerWidth = rect.width;
-  const containerHeight = rect.height;
+    // Set the scale for high-DPI displays
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.resetTransform();
+      ctx.scale(dimensions.pixelRatio, dimensions.pixelRatio);
+    }
+  } else {
+    // Legacy approach if dimensions aren't provided
+    // Get container dimensions
+    const rect = container.getBoundingClientRect();
 
-  // Set CSS dimensions
-  canvas.style.width = `${containerWidth}px`;
-  canvas.style.height = `${containerHeight}px`;
+    // Adjust for device pixel ratio for crisp rendering
+    const pixelRatio = window.devicePixelRatio || 1;
 
-  // Set internal canvas dimensions (scaled by pixel ratio)
-  canvas.width = Math.floor(containerWidth * pixelRatio);
-  canvas.height = Math.floor(containerHeight * pixelRatio);
+    // Ensure we have a square canvas based on the smallest dimension
+    const size = Math.min(rect.width, rect.height);
 
-  // Set the scale for high-DPI displays
-  const ctx = canvas.getContext("2d");
-  if (ctx) {
-    ctx.resetTransform();
-    ctx.scale(pixelRatio, pixelRatio);
+    // Set CSS dimensions
+    canvas.style.width = `${size}px`;
+    canvas.style.height = `${size}px`;
+
+    // Set internal canvas dimensions (scaled by pixel ratio)
+    canvas.width = Math.floor(size * pixelRatio);
+    canvas.height = Math.floor(size * pixelRatio);
+
+    // Set the scale for high-DPI displays
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.resetTransform();
+      ctx.scale(pixelRatio, pixelRatio);
+    }
   }
 }
